@@ -14,7 +14,7 @@ export default function Footer() {
         <Link display="inline-block" href="https://lid.sh" m="0px">
           <Image src="/LID_white_h.png" alt="Lid.sh Website" w="auto" h="35px" m="0px" />
         </Link>
-        <br/>
+        <Text mt="20px" fontSize="14px">LID Links</Text>
         <Link display="inline-block" href="https://discord.gg/eyJYrQu" m="20px" >
           <Image  w="auto" h="25px" src="./icons/discord.png" />
         </Link>

@@ -41,6 +41,10 @@ export default function Header({web3, address, isWhitelisted, onConnect}) {
             Lid Simplified Presale v0.1.0
           </Text>
         </Link>
+        <Text fontSize="12px" color="lid.fgLight" >
+          Lid Certification only protects against exit scams.<br/>
+          It does not provide any other guarantees.
+        </Text>
       </Box>
 
     </Box>
