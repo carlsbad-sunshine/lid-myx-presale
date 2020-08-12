@@ -87,7 +87,7 @@ function App() {
   const [web3, setWeb3] = useState(new Web3(provider))
   const [connected, setConnected] = useState(false)
 
-  const [startTime, setStartTime] = useState(Date.UTC(2020,7,13,3,0,0,0))
+  const [startTime, setStartTime] = useState(Date.UTC(2020,7,13,4,0,0,0))
   const [endTime, setEndTime] = useState(null)
   const [isActive, setIsActive] = useState(false)
   const [isEnded, setIsEnded] = useState(true)
