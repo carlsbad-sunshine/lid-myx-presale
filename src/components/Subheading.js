@@ -5,10 +5,11 @@ import {shortEther} from "../utils"
 
 export default function Subheading({
   web3, address, totalLid, totalEth,
-  totalDepositors, accountEthDeposit, accountLid
+  totalDepositors, accountEthDeposit, accountLid, maxShares
 }) {
   const toBN = web3.utils.toBN
   const toWei = web3.utils.toWei
+  const fromWei = web3.utils.fromWei
   return (
     <Box w="100%" m="0" p={["20px", "20px", "0px"]} pt="0px" pb="20px" bg="lid.bgMed" position="relative">
       <Box position="absolute" zIndex="1" left="0px" right="0px" bottom="0px" height="100px" bg="lid.bg" />
@@ -20,12 +21,9 @@ export default function Subheading({
             <Text fontSize="18px" m="0" p="0" color="lid.fgMed">
               Verified MYX Presale Contract
             </Text>
-            <Text m="0" p="0" mt="20px" >
-              TBD
-            </Text>
-            {/*<Link wordBreak="break-word" color="lid.brand" href={"https://etherscan.io/address/"+addresses.lidPresale} mt="15px" display="block">
-              {addresses.lidPresale}
-            </Link>*/}
+            <Link wordBreak="break-word" color="lid.brand" href={"https://etherscan.io/address/"+addresses.presale} mt="15px" display="block">
+              {addresses.presale}
+            </Link>
           </Box>
           <Box  w="100%"  border="solid 1px" borderColor="lid.stroke" color="white" borderRadius="5px" p="25px"
             bg="linear-gradient(0deg, rgba(12,101,235,1) 0%, rgba(28,158,247,1) 100%)" >
@@ -44,7 +42,11 @@ export default function Subheading({
               Your MYX Tokens
             </Text>
             <Text fontSize="38px" w="100%" fontWeight="bold">
-              {shortEther(accountLid,web3)}
+              {maxShares.toString() !== "0" ? (
+                shortEther(toBN(accountLid).mul(toBN(toWei("430000000"))).div(toBN(maxShares)),web3)
+              ) : (
+                "0"
+              )}
             </Text>
           </Box>
           <Box  w="100%"  border="solid 1px" borderColor="lid.stroke" color="lid.fg" borderRadius="5px" p="25px"

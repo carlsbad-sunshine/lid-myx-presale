@@ -1,11 +1,13 @@
-import lidPresale from "./abis/LidCertifiedPresale.json"
-import lidTimer from "./abis/LidCertifiedPresaleTimer.json"
-import lidToken from "./abis/LidToken.json"
+import presale from "./abis/LidSimplifiedPresale.json"
+import timer from "./abis/LidSimplifiedPresaleTimer.json"
+import redeemer from "./abis/LidSimplifiedPresaleRedeemer.json"
+import token from "./abis/IERC20.json"
 
 const abis = {
-  lidPresale: lidPresale,
-  lidTimer: lidTimer,
-  lidToken: lidToken
+  presale: presale,
+  timer: timer,
+  redeemer: redeemer,
+  token: token
 };
 
 export default abis;

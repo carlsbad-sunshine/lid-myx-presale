@@ -19,6 +19,58 @@
       "type": "event"
     },
     {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "Paused",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "PauserAdded",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "PauserRemoved",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "Unpaused",
+      "type": "event"
+    },
+    {
       "constant": true,
       "inputs": [
         {
@@ -27,7 +79,7 @@
           "type": "address"
         }
       ],
-      "name": "accountClaimedLid",
+      "name": "accountEthDeposit",
       "outputs": [
         {
           "internalType": "uint256",
@@ -40,45 +92,18 @@
       "type": "function"
     },
     {
-      "constant": true,
+      "constant": false,
       "inputs": [
         {
           "internalType": "address",
-          "name": "",
+          "name": "account",
           "type": "address"
         }
       ],
-      "name": "accountEarnedLid",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
+      "name": "addPauser",
+      "outputs": [],
       "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "name": "depositAccounts",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
+      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
@@ -104,48 +129,6 @@
     },
     {
       "constant": true,
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "name": "etherPoolBPs",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "name": "etherPools",
-      "outputs": [
-        {
-          "internalType": "address payable",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": true,
       "inputs": [],
       "name": "finalEndTime",
       "outputs": [
@@ -162,12 +145,12 @@
     {
       "constant": true,
       "inputs": [],
-      "name": "hasIssuedTokens",
+      "name": "finalEth",
       "outputs": [
         {
-          "internalType": "bool",
+          "internalType": "uint256",
           "name": "",
-          "type": "bool"
+          "type": "uint256"
         }
       ],
       "payable": false,
@@ -177,7 +160,22 @@
     {
       "constant": true,
       "inputs": [],
-      "name": "hasSentEther",
+      "name": "hardcap",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "hasIssuedTokens",
       "outputs": [
         {
           "internalType": "bool",
@@ -224,11 +222,11 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "",
+          "name": "account",
           "type": "address"
         }
       ],
-      "name": "isRepaired",
+      "name": "isPauser",
       "outputs": [
         {
           "internalType": "bool",
@@ -243,7 +241,7 @@
     {
       "constant": true,
       "inputs": [],
-      "name": "maxBuyPerAddressBP",
+      "name": "lidEthBP",
       "outputs": [
         {
           "internalType": "uint256",
@@ -258,7 +256,7 @@
     {
       "constant": true,
       "inputs": [],
-      "name": "maxBuyPerAddressBase",
+      "name": "maxBuyPerAddress",
       "outputs": [
         {
           "internalType": "uint256",
@@ -288,21 +286,6 @@
     {
       "constant": true,
       "inputs": [],
-      "name": "multiplierPrice",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [],
       "name": "owner",
       "outputs": [
         {
@@ -316,39 +299,33 @@
       "type": "function"
     },
     {
+      "constant": false,
+      "inputs": [],
+      "name": "pause",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "paused",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
       "constant": true,
       "inputs": [],
       "name": "presaleTokenBP",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "redeemBP",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "redeemInterval",
       "outputs": [
         {
           "internalType": "uint256",
@@ -406,18 +383,12 @@
       "type": "function"
     },
     {
-      "constant": true,
+      "constant": false,
       "inputs": [],
-      "name": "startingPrice",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
+      "name": "renouncePauser",
+      "outputs": [],
       "payable": false,
-      "stateMutability": "view",
+      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
@@ -456,21 +427,6 @@
           "internalType": "address",
           "name": "",
           "type": "address"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "totalDepositors",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
         }
       ],
       "payable": false,
@@ -538,6 +494,15 @@
       "type": "function"
     },
     {
+      "constant": false,
+      "inputs": [],
+      "name": "unpause",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
       "constant": true,
       "inputs": [
         {
@@ -563,12 +528,7 @@
       "inputs": [
         {
           "internalType": "uint256",
-          "name": "_maxBuyPerAddressBase",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_maxBuyPerAddressBP",
+          "name": "_maxBuyPerAddress",
           "type": "uint256"
         },
         {
@@ -578,12 +538,12 @@
         },
         {
           "internalType": "uint256",
-          "name": "_redeemBP",
+          "name": "_uniswapEthBP",
           "type": "uint256"
         },
         {
           "internalType": "uint256",
-          "name": "_redeemInterval",
+          "name": "_lidEthBP",
           "type": "uint256"
         },
         {
@@ -593,12 +553,7 @@
         },
         {
           "internalType": "uint256",
-          "name": "_startingPrice",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_multiplierPrice",
+          "name": "_hardcap",
           "type": "uint256"
         },
         {
@@ -607,13 +562,28 @@
           "type": "address"
         },
         {
-          "internalType": "contract LidCertifiedPresaleTimer",
+          "internalType": "contract LidSimplifiedPresaleTimer",
           "name": "_timer",
           "type": "address"
         },
         {
-          "internalType": "contract ILidCertifiableToken",
+          "internalType": "contract LidSimplifiedPresaleRedeemer",
+          "name": "_redeemer",
+          "type": "address"
+        },
+        {
+          "internalType": "contract IERC20",
           "name": "_token",
+          "type": "address"
+        },
+        {
+          "internalType": "contract IUniswapV2Router01",
+          "name": "_uniswapRouter",
+          "type": "address"
+        },
+        {
+          "internalType": "address payable",
+          "name": "_lidFund",
           "type": "address"
         }
       ],
@@ -651,25 +621,15 @@
       "constant": false,
       "inputs": [
         {
-          "internalType": "address payable[]",
-          "name": "_etherPools",
-          "type": "address[]"
+          "internalType": "uint256",
+          "name": "_uniswapTokenBP",
+          "type": "uint256"
         },
         {
-          "internalType": "uint256[]",
-          "name": "_etherPoolBPs",
-          "type": "uint256[]"
-        }
-      ],
-      "name": "setEtherPools",
-      "outputs": [],
-      "payable": false,
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "constant": false,
-      "inputs": [
+          "internalType": "uint256",
+          "name": "_presaleTokenBP",
+          "type": "uint256"
+        },
         {
           "internalType": "address[]",
           "name": "_tokenPools",
@@ -707,24 +667,26 @@
     },
     {
       "constant": false,
-      "inputs": [],
-      "name": "sendEther",
-      "outputs": [],
-      "payable": false,
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "constant": false,
       "inputs": [
         {
-          "internalType": "bool",
-          "name": "val",
-          "type": "bool"
+          "internalType": "address payable",
+          "name": "receiver",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
         }
       ],
-      "name": "setDepositPause",
-      "outputs": [],
+      "name": "releaseEthToAddress",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
       "payable": false,
       "stateMutability": "nonpayable",
       "type": "function"
@@ -803,45 +765,9 @@
       "type": "function"
     },
     {
-      "constant": false,
-      "inputs": [
-        {
-          "internalType": "address[]",
-          "name": "accounts",
-          "type": "address[]"
-        }
-      ],
-      "name": "resetRepair",
-      "outputs": [],
-      "payable": false,
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "constant": false,
-      "inputs": [
-        {
-          "internalType": "address[]",
-          "name": "accounts",
-          "type": "address[]"
-        }
-      ],
-      "name": "repair",
-      "outputs": [],
-      "payable": false,
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
       "constant": true,
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "account",
-          "type": "address"
-        }
-      ],
-      "name": "calculateReedemable",
+      "inputs": [],
+      "name": "getMaxWhitelistedDeposit",
       "outputs": [
         {
           "internalType": "uint256",
@@ -856,33 +782,12 @@
     {
       "constant": true,
       "inputs": [],
-      "name": "calculateRatePerEth",
+      "name": "isPresaleEnded",
       "outputs": [
         {
-          "internalType": "uint256",
+          "internalType": "bool",
           "name": "",
-          "type": "uint256"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "atTotalDeposited",
-          "type": "uint256"
-        }
-      ],
-      "name": "getMaxWhitelistedDeposit",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
+          "type": "bool"
         }
       ],
       "payable": false,

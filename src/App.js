@@ -90,7 +90,7 @@ function App() {
   const [startTime, setStartTime] = useState(Date.UTC(2020,7,13,4,0,0,0))
   const [endTime, setEndTime] = useState(null)
   const [isActive, setIsActive] = useState(false)
-  const [isEnded, setIsEnded] = useState(true)
+  const [isEnded, setIsEnded] = useState(false)
 
   const [lidPresaleSC, setLidPresale] = useState(null)
   const [lidTimerSC, setLidTimerSC] = useState(null)
@@ -117,6 +117,7 @@ function App() {
   const [accountClaimedLid, setAccountClaimedLid] = useState("0")
 
   const [depositVal, setDepositVal] = useState("")
+  const [maxShares, setMaxShares] = useState("0")
 
   const toBN = web3.utils.toBN
   const toWei = web3.utils.toWei
@@ -129,59 +130,58 @@ function App() {
     if(!web3) return
     if(!address) return
 
-    const lidPresaleSC = new web3.eth.Contract(abis.lidPresale, addresses.lidPresale)
-    const lidTimerSC = new web3.eth.Contract(abis.lidTimer, addresses.lidTimer)
-    const lidTokenSC = new web3.eth.Contract(abis.lidToken, addresses.lidToken)
-    if (!lidPresaleSC) return
-    if (!lidTimerSC) return
-    if (!lidTokenSC) return
+    const presale = new web3.eth.Contract(abis.presale, addresses.presale)
+    const timer = new web3.eth.Contract(abis.timer, addresses.timer)
+    const redeemer = new web3.eth.Contract(abis.redeemer, addresses.redeemer)
+    const token = new web3.eth.Contract(abis.token, addresses.token)
 
-    setLidPresale(lidPresaleSC)
-    setLidTimerSC(lidTimerSC)
-    setLidTokenSC(lidTokenSC)
+    setLidPresale(presale)
 
     //TODO: Switch to multicall.js
-    let fetchData = async(web3,address,lidPresaleSC,lidTimerSC,lidTokenSC)=>{
-      /*
+    let fetchData = async(web3,address,presale,timer,redeemer,token)=>{
       const [
         totalLid,
         totalEth,
         totalDepositors,
         accountLid,
         accountEthDeposit,
-        currentPrice,
         earnedReferrals,
         referralCount,
-        isWhitelisted,
         hasSentToUniswap,
         hasIssuedTokens,
-        hasSentEther,
         finalEndTime,
-        accountRedeemable,
-        accountClaimedLid
+        accountClaimedLid,
+        isEnded,
+        maxShares
       ] = await Promise.all([
-        lidPresaleSC.methods.totalTokens().call(),
-        web3.eth.getBalance(addresses.lidPresale),
-        lidPresaleSC.methods.totalDepositors().call(),
-        lidPresaleSC.methods.accountEarnedLid(address).call(),
-        lidPresaleSC.methods.depositAccounts(address).call(),
-        lidPresaleSC.methods.calculateRatePerEth().call(),
-        lidPresaleSC.methods.earnedReferrals(address).call(),
-        lidPresaleSC.methods.referralCounts(address).call(),
-        lidPresaleSC.methods.whitelist(address).call(),
-        lidPresaleSC.methods.whitelist(address).call(),
-        lidPresaleSC.methods.hasSentToUniswap().call(),
-        lidPresaleSC.methods.hasIssuedTokens().call(),
-        lidPresaleSC.methods.finalEndTime().call(),
-        lidPresaleSC.methods.calculateReedemable(address).call(),
-        lidPresaleSC.methods.accountClaimedLid(address).call()
+        presale.methods.totalTokens().call(),
+        web3.eth.getBalance(addresses.presale),
+        redeemer.methods.totalDepositors().call(),
+        redeemer.methods.accountShares(address).call(),
+        redeemer.methods.accountDeposits(address).call(),
+        presale.methods.earnedReferrals(address).call(),
+        presale.methods.referralCounts(address).call(),
+        presale.methods.hasSentToUniswap().call(),
+        presale.methods.hasIssuedTokens().call(),
+        presale.methods.finalEndTime().call(),
+        redeemer.methods.accountClaimedTokens(address).call(),
+        presale.methods.isPresaleEnded().call(),
+        redeemer.methods.getMaxShares(toWei("1000")).call()
       ])
 
-      const [maxDeposit, endTime] = await Promise.all([
-        lidPresaleSC.methods.getMaxWhitelistedDeposit(totalEth).call(),
-        lidTimerSC.methods.getEndTime(totalEth).call()
+      const [
+        maxDeposit,
+        endTime,
+        currentPrice,
+        accountRedeemable
+      ] = await Promise.all([
+        presale.methods.getMaxWhitelistedDeposit().call(),
+        timer.methods.endTime().call(),
+        redeemer.methods.calculateRatePerEth(toWei("430000000"),totalEth,toWei("1000")).call(),
+        redeemer.methods.calculateReedemable(address, finalEndTime, toWei("430000000")).call()
       ])
-
+      console.log("maxShares",maxShares)
+      console.log("maxShares string",maxShares.toString())
       setTotalLid(totalLid)
       setTotalEth(totalEth)
       setTotalDepositors(totalDepositors)
@@ -199,21 +199,22 @@ function App() {
       setFinalEndTime(finalEndTime)
       setAccountRedeemable(accountRedeemable)
       setAccountClaimedLid(accountClaimedLid)
-      */
+      setIsEnded(isEnded)
+      setMaxShares(maxShares)
     }
 
-    fetchData(web3,address,lidPresaleSC,lidTimerSC,lidTokenSC)
+    fetchData(web3,address,presale,timer,redeemer,token)
 
     let interval;
     if(window.web3){
-      interval = setInterval((web3,address,lidPresaleSC,lidTimerSC,lidTokenSC)=>{
-        if(!web3 || !address || !lidPresaleSC || !lidTimerSC || !lidTokenSC) return
-        fetchData(web3,address,lidPresaleSC,lidTimerSC,lidTokenSC)
+      interval = setInterval((web3,address,presale,timer,redeemer,token)=>{
+        if(!web3 || !address || !presale || !timer || !redeemer) return
+        fetchData(web3,address,presale,timer,redeemer,token)
       },2000)
     }else{
-      interval = setInterval((web3,address,lidPresaleSC,lidTimerSC,lidTokenSC)=>{
-        if(!web3 || !address || !lidPresaleSC || !lidTimerSC || !lidTokenSC) return
-        fetchData(web3,address,lidPresaleSC,lidTimerSC,lidTokenSC)
+      interval = setInterval((web3,address,presale,timer,redeemer,token)=>{
+        if(!web3 || !address || !presale || !timer || !redeemer) return
+        fetchData(web3,address,presale,timer,redeemer,token)
       },10000)
     }
 
@@ -260,11 +261,6 @@ function App() {
     await lidPresaleSC.methods.issueTokens().send({from: address})
   }
 
-  const handleAllocateEth = async function() {
-    await lidPresaleSC.methods.sendEther().send({from: address})
-  }
-
-
   const resetApp = async () => {
     if (web3 && web3.currentProvider && web3.currentProvider.close) {
       await web3.currentProvider.close();
@@ -305,6 +301,7 @@ function App() {
   },[])
 
   useEffect(()=>{
+    setIsActive(true)
     if(Date.now() < startTime){
       let interval = setInterval(()=>{
         setIsActive(Date.now() > startTime)
@@ -322,22 +319,27 @@ function App() {
       <CSSReset />
       <Header web3={web3} address={address} onConnect={onConnect} isWhitelisted={isWhitelisted} />
       <Subheading web3={web3} address={address} totalLid={totalLid} totalEth={totalEth}
-        totalDepositors={totalDepositors} accountEthDeposit={accountEthDeposit} accountLid={accountLid} />
-      {isActive &&
+        totalDepositors={totalDepositors} accountEthDeposit={accountEthDeposit} accountLid={accountLid} maxShares={maxShares}/>
+      {(isActive & isEnded) &&
         <Claimer web3={web3} accountLid={accountLid} handleLidClaim={handleLidClaim}
             hasSentToUniswap={hasSentToUniswap} hasIssuedTokens={hasIssuedTokens} hasSentEther={hasSentEther}
             finalEndTime={finalEndTime} accountRedeemable={accountRedeemable} accountClaimedLid={accountClaimedLid} />
       }
-      {!isActive &&
+      {(isActive && !isEnded) && (<>
+        <EndTimer expiryTimestamp={endTime} />
+        <DepositForm web3={web3} rate={currentPrice} cap={toWei("20")}
+        accountDeposit={accountEthDeposit} setVal={setDepositVal} val={depositVal} handleClick={handleDeposit} isWhitelisted={false} />
+        </>)
+      }
+      {(!isActive && !isEnded) &&
         <StartTimer expiryTimestamp={startTime} />
       }
       <ReferralCode web3={web3} address={address} earnedReferrals={earnedReferrals} referralCount={referralCount} />
       <Box w="100%" maxW="1200px" bg="lid.stroke" height="1px" mt="40px" mb="40px" ml="auto" mr="auto"/>
-      {isActive &&
+      {(isActive && isEnded) &&
         <PresaleCompletion isActive={isActive} isEnded={isEnded}
           handleSendToUniswap={handleSendToUniswap}
           handleIssueTokens={handleIssueTokens}
-          handleAllocateEth={handleAllocateEth}
         />
       }
 

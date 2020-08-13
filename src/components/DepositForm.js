@@ -34,23 +34,17 @@ export default function DepositForm({web3,rate,cap,accountDeposit,setVal,val,han
     <Box w="100%" maxWidth="1200px" ml="auto" mr="auto" mt="60px" mb="60px" pl={{base:"20px", lg:"0px"}} pr={{base:"20px", lg:"0px"}}>
       <Box w="100%" p="20px"textAlign="left" color="lid.fg" position="relative" border="solid 1px" borderColor="lid.stroke">
         <Text fontSize={{base:"24px",sm:"36px"}} fontWeight="bold">
-          Deposit ETH for LID
+          Deposit ETH for MYX
         </Text>
         <Text fontSize="18px" color="blue.500">
-          Minimum 0.01 ETH, Maximum 1 ETH (10 ETH + 2% for whitelisted)
+          Minimum 0.01 ETH, Maximum 20 ETH
         </Text>
         <Text fontSize="18px" color="red.500">
           Your Available Max: {shortenDecimal(fromWei(availableMax))} ETH
         </Text>
-        { isWhitelisted ? (<Text fontSize="14px" color="lid.fgMed">
-          (Whitelist cap: {shortenDecimal(fromWei(cap))} ETH)
-        </Text>) : (<Text fontSize="14px" color="lid.fgMed">
-          (Non-Whitelist cap: 1 ETH)
-        </Text>)
-        }
         <Text fontSize="18px">
-          Estimated LID: {!val ? "0" : shortenDecimal(
-            toBN(val).div(toBN(rate))
+          Estimated MYX: {!val ? "0" : shortenDecimal(
+            fromWei(toBN(fromWei(val)).mul(toBN(rate)).mul(toBN("10000")).div(toBN("10250")))
           )}
         </Text>
 
