@@ -4,7 +4,7 @@ import { Text, Box, Button, Grid } from "@chakra-ui/core"
 import {shortEther} from "../utils"
 import CountDownShort from "./CountDownShort"
 
-export default function Claimer({web3, hasSentToUniswap, hasIssuedTokens, hasSentEther, finalEndTime, accountLid, accountRedeemable, accountClaimedLid, handleLidClaim}) {
+export default function Claimer({web3, hasSentToUniswap, hasIssuedTokens, hasSentEther, finalEndTime, accountLid, accountRedeemable, maxShares, accountClaimedLid, handleLidClaim}) {
   const toBN = web3.utils.toBN
   const toWei = web3.utils.toWei
   const fromWei = web3.utils.fromWei
@@ -44,10 +44,12 @@ export default function Claimer({web3, hasSentToUniswap, hasIssuedTokens, hasSen
           MYX / Hour
         </Text>
         <Text fontSize="38px" w="100%" fontWeight="bold">
-          {shortEther(
-            toBN(accountLid).mul(toBN("2")).div(toBN("100")),
-            web3)
-          }
+          {maxShares.toString() !== "0" ? (
+            shortEther(toBN(accountLid).mul(toBN(toWei("630000000"))).div(toBN(maxShares))
+            .mul(toBN("2")).div(toBN("100")),web3)
+          ) : (
+            "0"
+          )}
         </Text>
       </Box>
     </Grid>

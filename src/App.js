@@ -321,7 +321,7 @@ function App() {
       <Subheading web3={web3} address={address} totalLid={totalLid} totalEth={totalEth}
         totalDepositors={totalDepositors} accountEthDeposit={accountEthDeposit} accountLid={accountLid} maxShares={maxShares}/>
       {(isActive & isEnded) &&
-        <Claimer web3={web3} accountLid={accountLid} handleLidClaim={handleLidClaim}
+        <Claimer web3={web3} accountLid={accountLid} handleLidClaim={handleLidClaim} maxShares={maxShares}
             hasSentToUniswap={hasSentToUniswap} hasIssuedTokens={hasIssuedTokens} hasSentEther={hasSentEther}
             finalEndTime={finalEndTime} accountRedeemable={accountRedeemable} accountClaimedLid={accountClaimedLid} />
       }
