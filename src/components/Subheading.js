@@ -43,7 +43,7 @@ export default function Subheading({
             </Text>
             <Text fontSize="38px" w="100%" fontWeight="bold">
               {maxShares.toString() !== "0" ? (
-                shortEther(toBN(accountLid).mul(toBN(toWei("630000000"))).div(toBN(maxShares)),web3)
+                shortEther(toBN(accountLid).mul(toBN(toWei("680000000"))).div(toBN(maxShares)),web3)
               ) : (
                 "0"
               )}
@@ -76,7 +76,7 @@ export default function Subheading({
               Total Presale MYX
             </Text>
             <Text fontSize="38px" w="100%" fontWeight="bold" color="lid.brand">
-              {shortEther(toWei("630000000"),web3)}
+              {shortEther(toWei("680000000"),web3)}
             </Text>
           </Box>
         </Grid>

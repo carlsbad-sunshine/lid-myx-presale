@@ -45,7 +45,7 @@ export default function Claimer({web3, hasSentToUniswap, hasIssuedTokens, hasSen
         </Text>
         <Text fontSize="38px" w="100%" fontWeight="bold">
           {maxShares.toString() !== "0" ? (
-            shortEther(toBN(accountLid).mul(toBN(toWei("630000000"))).div(toBN(maxShares))
+            shortEther(toBN(accountLid).mul(toBN(toWei("680000000"))).div(toBN(maxShares))
             .mul(toBN("2")).div(toBN("100")),web3)
           ) : (
             "0"

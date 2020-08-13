@@ -38,7 +38,7 @@ export default function Header({web3, address, isWhitelisted, onConnect}) {
         <Link display="inline-block" href="https://lid.sh" m="0px" >
           <Image src="/logo-lid.png" alt="myx Website" w="auto" h="20px" display="inline-block" position="relative" top="-3px"/>
           <Text as="span" fontWeight="bold" display="inline-block" ml="5px" >
-            Lid Simplified Presale v0.3.0
+            Lid Simplified Presale v0.3.1
           </Text>
         </Link>
         <Text fontSize="12px" color="lid.fgLight" >
