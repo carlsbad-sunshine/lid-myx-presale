@@ -2,7 +2,7 @@ import React from 'react';
 import { Text, Box, Flex, Image, Link, Button } from "@chakra-ui/core"
 import Blockie from "./Blockie"
 
-export default function Header({web3, address, isWhitelisted, onConnect}) {
+export default function Header({web3, address, onConnect}) {
 
   return (
     <Box w="100%" bg="lid.bgMed" m="0" pt="0px">
@@ -30,11 +30,6 @@ export default function Header({web3, address, isWhitelisted, onConnect}) {
         }
       </Flex>
       <Box color="lid.fgMed" display="block" w="100%"  pl={{base:"20px", lg:"0px"}} pr={{base:"20px", lg:"0px"}} maxW="1200px" ml="auto" mr="auto">
-      {/*
-        <Text float="right">
-        Whitelisted? {isWhitelisted ? "Yes" : "No"}
-        </Text>
-      */}
         <Link display="inline-block" href="https://lid.sh" m="0px" >
           <Image src="/logo-lid.png" alt="myx Website" w="auto" h="20px" display="inline-block" position="relative" top="-3px"/>
           <Text as="span" fontWeight="bold" display="inline-block" ml="5px" >

@@ -7,7 +7,7 @@ import {Box, Text, Button, NumberInput, NumberInputField  } from "@chakra-ui/cor
     return decimalString.substring(0,decimalString.indexOf('.'))
   }
 
-export default function DepositForm({web3,rate,cap,accountDeposit,setVal,val,handleClick,isWhitelisted}) {
+export default function DepositForm({web3,rate,cap,accountDeposit,setVal,val,handleClick}) {
 
   const toBN = web3.utils.toBN
   const toWei = web3.utils.toWei
