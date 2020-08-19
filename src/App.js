@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { createWatcher } from "@makerdao/multicall";
 import addresses from "./contracts/addresses";
 import abis from "./contracts/abis";
 import { ThemeProvider, CSSReset, Box } from "@chakra-ui/core"
@@ -28,7 +29,11 @@ import DepositForm from "./components/DepositForm"
 import PresaleCompletion from "./components/PresaleCompletion"
 import Claimer from "./components/Claimer"
 
-const INFURA_ID = "f955014944b64ba2b1cab50d496a2b90"
+const INFURA_IDS = [
+  "ae2a1095738a45158a9401678dcf74c3",
+  "dfbec2f8c3b940e09e18c7692210370e",
+  "f2ed9fbfc3104c44995dd5eef0be78f6"
+]
 
 const providerOptions = {
   walletconnect: {
@@ -78,46 +83,55 @@ const web3Modal = new Web3Modal({
   providerOptions // required
 });
 
-
+const defaultWatcher = createWatcher([], {});
+const walletWatcher = createWatcher([], {});
 
 function App() {
 
-  const [address, setAddress] = useState("")
-  const [provider, setProvider] = useState(new Web3.providers.HttpProvider('https://mainnet.infura.io/v3/'+INFURA_ID))
+  const [address, setAddress] = useState("");
+  const [provider, setProvider] = useState(new Web3.providers.HttpProvider('https://mainnet.infura.io/v3/'+INFURA_IDS[Math.floor(Math.random() * 100 % 3)]))
   const [web3, setWeb3] = useState(new Web3(provider))
-  const [connected, setConnected] = useState(false)
 
-  const [startTime, setStartTime] = useState(Date.UTC(2020,7,13,4,0,0,0))
-  const [endTime, setEndTime] = useState(null)
   const [isActive, setIsActive] = useState(false)
-  const [isEnded, setIsEnded] = useState(false)
 
-  const [lidPresaleSC, setLidPresale] = useState(null)
-  const [lidTimerSC, setLidTimerSC] = useState(null)
-  const [lidTokenSC, setLidTokenSC] = useState(null)
+  const [lidPresaleSC, setLidPresale] = useState(null);
+  const [depositVal, setDepositVal] = useState("");
 
-  const [totalLid, setTotalLid] = useState("0")
-  const [totalEth, setTotalEth] = useState("0")
-  const [totalDepositors, setTotalDepositors] = useState("0")
+  const [state, setState] = useState({
+    startTime: Date.UTC(2020, 7, 13, 4, 0, 0, 0),
+    endTime: null,
+    totalEth: "0",
+    totalDepositors: "0",
+    accountShare: "0",
+    accountEthDeposit: "0",
+    currentPrice: "0",
+    maxDeposit: "0",
+    earnedReferrals: "0",
+    referralCount: "0",
+    finalEndTime: "0",
+    accountRedeemable: "0",
+    accountClaimedMYX: "0",
+    maxShares: "0",
+    isEnded: false
+  });
 
-  const [accountLid, setAccountLid] = useState("0")
-  const [accountEthDeposit, setAccountEthDeposit] = useState("0")
-  const [isWhitelisted, setIsWhitelisted] = useState(false)
-
-  const [currentPrice, setCurrentPrice] = useState("0")
-  const [maxDeposit, setMaxDeposit] = useState("0")
-  const [earnedReferrals, setEarnedReferrals] = useState("0")
-  const [referralCount, setReferralCount] = useState("0")
-
-  const [hasSentToUniswap, setHasSentToUniswap] = useState(false)
-  const [hasIssuedTokens, setHasIssuedTokens] = useState(false)
-  const [hasSentEther, setHasSentEther] = useState(false)
-  const [finalEndTime, setFinalEndTime] = useState("0")
-  const [accountRedeemable, setAccountRedeemable] = useState("0")
-  const [accountClaimedLid, setAccountClaimedLid] = useState("0")
-
-  const [depositVal, setDepositVal] = useState("")
-  const [maxShares, setMaxShares] = useState("0")
+  const {
+    startTime,
+    endTime,
+    totalEth,
+    totalDepositors,
+    accountShare,
+    accountEthDeposit,
+    currentPrice,
+    maxDeposit,
+    earnedReferrals,
+    referralCount,
+    finalEndTime,
+    accountRedeemable,
+    accountClaimedMYX,
+    maxShares,
+    isEnded
+  } = state;
 
   const toBN = web3.utils.toBN
   const toWei = web3.utils.toWei
@@ -126,104 +140,146 @@ function App() {
   let referralAddress = window.location.hash.substr(2);
   if(!referralAddress || referralAddress.length !== 42 ) referralAddress = "0x0000000000000000000000000000000000000000"
 
-  useEffect(()=>{
-    if(!web3) return
-    if(!address) return
-
-    const presale = new web3.eth.Contract(abis.presale, addresses.presale)
-    const timer = new web3.eth.Contract(abis.timer, addresses.timer)
-    const redeemer = new web3.eth.Contract(abis.redeemer, addresses.redeemer)
-    const token = new web3.eth.Contract(abis.token, addresses.token)
-
-    setLidPresale(presale)
-
-    //TODO: Switch to multicall.js
-    let fetchData = async(web3,address,presale,timer,redeemer,token)=>{
-      const [
-        totalLid,
-        totalEth,
-        totalDepositors,
-        accountLid,
-        accountEthDeposit,
-        earnedReferrals,
-        referralCount,
-        hasSentToUniswap,
-        hasIssuedTokens,
-        finalEndTime,
-        accountClaimedLid,
-        isEnded,
-        maxShares
-      ] = await Promise.all([
-        presale.methods.totalTokens().call(),
-        web3.eth.getBalance(addresses.presale),
-        redeemer.methods.totalDepositors().call(),
-        redeemer.methods.accountShares(address).call(),
-        redeemer.methods.accountDeposits(address).call(),
-        presale.methods.earnedReferrals(address).call(),
-        presale.methods.referralCounts(address).call(),
-        presale.methods.hasSentToUniswap().call(),
-        presale.methods.hasIssuedTokens().call(),
-        presale.methods.finalEndTime().call(),
-        redeemer.methods.accountClaimedTokens(address).call(),
-        presale.methods.isPresaleEnded().call(),
-        redeemer.methods.getMaxShares(toWei("1000")).call()
-      ])
-
-      const [
-        maxDeposit,
-        endTime,
-        currentPrice,
-        accountRedeemable
-      ] = await Promise.all([
-        presale.methods.getMaxWhitelistedDeposit().call(),
-        timer.methods.endTime().call(),
-        redeemer.methods.calculateRatePerEth(toWei("430000000"),totalEth,toWei("1000")).call(),
-        redeemer.methods.calculateReedemable(address, finalEndTime, toWei("430000000")).call()
-      ])
-      console.log("maxShares",maxShares)
-      console.log("maxShares string",maxShares.toString())
-      setTotalLid(totalLid)
-      setTotalEth(totalEth)
-      setTotalDepositors(totalDepositors)
-      setAccountLid(accountLid)
-      setAccountEthDeposit(accountEthDeposit)
-      setCurrentPrice(currentPrice)
-      setEarnedReferrals(earnedReferrals)
-      setReferralCount(referralCount)
-      setIsWhitelisted(isWhitelisted)
-      setMaxDeposit(maxDeposit)
-      setEndTime(new Date(endTime*1000))
-      setHasSentToUniswap(hasSentToUniswap)
-      setHasIssuedTokens(hasIssuedTokens)
-      setHasSentEther(hasSentEther)
-      setFinalEndTime(finalEndTime)
-      setAccountRedeemable(accountRedeemable)
-      setAccountClaimedLid(accountClaimedLid)
-      setIsEnded(isEnded)
-      setMaxShares(maxShares)
+  useEffect(() => {
+    if (!web3) {
+      return;
     }
 
-    fetchData(web3,address,presale,timer,redeemer,token)
+    const multiCallConfig = {
+      web3,
+      multicallAddress: "0xeefba1e63905ef1d7acba5a8513c70307c1ce441",
+      interval: 5000,
+    };
 
-    let interval;
-    if(window.web3){
-      interval = setInterval((web3,address,presale,timer,redeemer,token)=>{
-        if(!web3 || !address || !presale || !timer || !redeemer) return
-        fetchData(web3,address,presale,timer,redeemer,token)
-      },2000)
-    }else{
-      interval = setInterval((web3,address,presale,timer,redeemer,token)=>{
-        if(!web3 || !address || !presale || !timer || !redeemer) return
-        fetchData(web3,address,presale,timer,redeemer,token)
-      },10000)
+    const presale = new web3.eth.Contract(abis.presale, addresses.presale);
+    setLidPresale(presale);
+
+    defaultWatcher.recreate(
+      [
+        {
+          call: ["getEthBalance(address)(uint256)", addresses.presale],
+          returns: [["totalEth", (val) => val.toString()]],
+        },
+        {
+          target: addresses.redeemer,
+          call: ["totalDepositors()(uint256)"],
+          returns: [["totalDepositors", (val) => val.toString()]],
+        },
+        {
+          target: addresses.presale,
+          call: ["finalEndTime()(uint256)"],
+          returns: [["finalEndTime", (val) => val.toString()]],
+        },
+        {
+          target: addresses.presale,
+          call: ["isPresaleEnded()(bool)"],
+          returns: [["isEnded"]],
+        },
+        {
+          target: addresses.redeemer,
+          call: ["getMaxShares(uint256)(uint256)", toWei("1000")],
+          returns: [["maxShares", (val) => val.toString()]],
+        },
+        {
+          target: addresses.presale,
+          call: ["getMaxWhitelistedDeposit()(uint256)"],
+          returns: [["maxDeposit", (val) => val.toString()]],
+        },
+        {
+          target: addresses.timer,
+          call: ["endTime()(uint256)"],
+          returns: [["endTime", (val) => new Date(val * 1000)]],
+        },
+      ],
+      multiCallConfig
+    );
+
+    defaultWatcher.subscribe((update) => {
+      setState((prevState) => ({
+        ...prevState,
+        [update.type]: update.value,
+      }));
+    });
+
+    defaultWatcher.start();
+
+  }, [web3]);
+
+  useEffect(() => {
+    if (!web3 || !address) {
+      return;
     }
+    
+    const multiCallConfig = {
+      web3,
+      multicallAddress: "0xeefba1e63905ef1d7acba5a8513c70307c1ce441",
+      interval: 5000,
+    };
+  
+    walletWatcher.recreate(
+      [
+        {
+          target: addresses.redeemer,
+          call: ["accountShares(address)(uint256)", address],
+          returns: [["accountShare", (val) => val.toString()]],
+        },
+        {
+          target: addresses.redeemer,
+          call: ["accountDeposits(address)(uint256)", address],
+          returns: [["accountEthDeposit", (val) => val.toString()]],
+        },
+        {
+          target: addresses.presale,
+          call: ["earnedReferrals(address)(uint256)", address],
+          returns: [["earnedReferrals", (val) => val.toString()]],
+        },
+        {
+          target: addresses.presale,
+          call: ["referralCounts(address)(uint256)", address],
+          returns: [["referralCounts", (val) => val.toString()]],
+        },
+        {
+          target: addresses.redeemer,
+          call: ["accountClaimedTokens(address)(uint256)", address],
+          returns: [["accountClaimedMYX", (val) => val.toString()]],
+        },
+        {
+          target: addresses.redeemer,
+          call: [
+            "calculateRatePerEth(uint256,uint256,uint256)(uint256)",
+            toWei("680000000"),
+            totalEth,
+            toWei("1000"),
+          ],
+          returns: [["currentPrice", (val) => val.toString()]],
+        },
+        {
+          target: addresses.redeemer,
+          call: [
+            "calculateReedemable(address,uint256,uint256)(uint256)",
+            address,
+            finalEndTime,
+            toWei("680000000"),
+          ],
+          returns: [["accountRedeemable", (val) => val.toString()]],
+        },
+      ],
+      multiCallConfig
+    );
 
-    return ()=>clearInterval(interval)
+    walletWatcher.subscribe((update) => {
+      const { type, value } = update;
+      setState((prevState) => ({
+        ...prevState,
+        [type]: value
+      }));
+    });
 
-  },[web3,address])
+    walletWatcher.start();
+  }, [web3, address, finalEndTime, totalEth])
 
   const handleDeposit = async function () {
-    if(depositVal == "" || depositVal == null || depositVal == undefined) {
+    if(!depositVal) {
       alert("Must enter a value between 0.01 eth and max.")
       return
     }
@@ -269,7 +325,6 @@ function App() {
     setAddress("")
     setWeb3(null)
     setProvider(null)
-    setConnected(false)
   };
 
   //TODO: event subscriptions to auto update UI
@@ -290,7 +345,6 @@ function App() {
     const accounts = await web3.eth.getAccounts()
     const address = accounts[0]
 
-    setConnected(true)
     setAddress(address)
     setProvider(provider)
     setWeb3(web3)
@@ -312,23 +366,20 @@ function App() {
     }
   },[startTime])
 
-
-  console.log("appweb3",web3)
   return (
     <ThemeProvider theme={theme} >
       <CSSReset />
-      <Header web3={web3} address={address} onConnect={onConnect} isWhitelisted={isWhitelisted} />
-      <Subheading web3={web3} address={address} totalLid={totalLid} totalEth={totalEth}
-        totalDepositors={totalDepositors} accountEthDeposit={accountEthDeposit} accountLid={accountLid} maxShares={maxShares}/>
+      <Header web3={web3} address={address} onConnect={onConnect} />
+      <Subheading web3={web3} totalEth={totalEth}
+        totalDepositors={totalDepositors} accountEthDeposit={accountEthDeposit} accountShare={accountShare} maxShares={maxShares}/>
       {(isActive & isEnded) &&
-        <Claimer web3={web3} accountLid={accountLid} handleLidClaim={handleLidClaim} maxShares={maxShares}
-            hasSentToUniswap={hasSentToUniswap} hasIssuedTokens={hasIssuedTokens} hasSentEther={hasSentEther}
-            finalEndTime={finalEndTime} accountRedeemable={accountRedeemable} accountClaimedLid={accountClaimedLid} />
+        <Claimer web3={web3} accountShare={accountShare} handleLidClaim={handleLidClaim} maxShares={maxShares}
+            finalEndTime={finalEndTime} accountRedeemable={accountRedeemable} accountClaimedMYX={accountClaimedMYX} />
       }
       {(isActive && !isEnded) && (<>
         <EndTimer expiryTimestamp={endTime} />
         <DepositForm web3={web3} rate={currentPrice} cap={toWei("20")}
-        accountDeposit={accountEthDeposit} setVal={setDepositVal} val={depositVal} handleClick={handleDeposit} isWhitelisted={false} />
+        accountDeposit={accountEthDeposit} setVal={setDepositVal} val={depositVal} handleClick={handleDeposit} />
         </>)
       }
       {(!isActive && !isEnded) &&

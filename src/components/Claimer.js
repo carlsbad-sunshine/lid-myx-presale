@@ -4,7 +4,7 @@ import { Text, Box, Button, Grid } from "@chakra-ui/core"
 import {shortEther} from "../utils"
 import CountDownShort from "./CountDownShort"
 
-export default function Claimer({web3, hasSentToUniswap, hasIssuedTokens, hasSentEther, finalEndTime, accountLid, accountRedeemable, maxShares, accountClaimedLid, handleLidClaim}) {
+export default function Claimer({web3, finalEndTime, accountShare, accountRedeemable, maxShares, accountClaimedMYX, handleLidClaim}) {
   const toBN = web3.utils.toBN
   const toWei = web3.utils.toWei
   const fromWei = web3.utils.fromWei
@@ -36,7 +36,7 @@ export default function Claimer({web3, hasSentToUniswap, hasIssuedTokens, hasSen
           Total MYX Claimed
         </Text>
         <Text fontSize="38px" w="100%" fontWeight="bold">
-          {shortEther(accountClaimedLid,web3)}
+          {shortEther(accountClaimedMYX,web3)}
         </Text>
       </Box>
       <Box w="100%"  borderRadius="5px" p="25px" border="solid 1px" borderColor="lid.stroke" bg="lid.bg" >
@@ -45,7 +45,7 @@ export default function Claimer({web3, hasSentToUniswap, hasIssuedTokens, hasSen
         </Text>
         <Text fontSize="38px" w="100%" fontWeight="bold">
           {maxShares.toString() !== "0" ? (
-            shortEther(toBN(accountLid).mul(toBN(toWei("680000000"))).div(toBN(maxShares))
+            shortEther(toBN(accountShare).mul(toBN(toWei("680000000"))).div(toBN(maxShares))
             .mul(toBN("2")).div(toBN("100")),web3)
           ) : (
             "0"

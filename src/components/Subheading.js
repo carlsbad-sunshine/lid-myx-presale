@@ -4,8 +4,8 @@ import addresses from "../contracts/addresses"
 import {shortEther} from "../utils"
 
 export default function Subheading({
-  web3, address, totalLid, totalEth,
-  totalDepositors, accountEthDeposit, accountLid, maxShares
+  web3, totalEth,
+  totalDepositors, accountEthDeposit, accountShare, maxShares
 }) {
   const toBN = web3.utils.toBN
   const toWei = web3.utils.toWei
@@ -43,7 +43,7 @@ export default function Subheading({
             </Text>
             <Text fontSize="38px" w="100%" fontWeight="bold">
               {maxShares.toString() !== "0" ? (
-                shortEther(toBN(accountLid).mul(toBN(toWei("680000000"))).div(toBN(maxShares)),web3)
+                shortEther(toBN(accountShare).mul(toBN(toWei("680000000"))).div(toBN(maxShares)),web3)
               ) : (
                 "0"
               )}
