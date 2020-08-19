@@ -188,7 +188,7 @@ function App() {
         {
           target: addresses.timer,
           call: ["endTime()(uint256)"],
-          returns: [["endTime", (val) => new Date(endTime * 1000)]],
+          returns: [["endTime", (val) => new Date(val * 1000)]],
         },
       ],
       multiCallConfig
